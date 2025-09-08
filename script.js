@@ -17,6 +17,12 @@ async function carregarFormulario() {
     try {
         showLoading();
         
+        // Testar conexão primeiro
+        const conexaoOk = await testarConexao();
+        if (!conexaoOk) {
+            throw new Error('Não foi possível conectar ao servidor. Verifique a URL do script.');
+        }
+        
         // Carregar perguntas e configurações em paralelo
         const [perguntasData, configuracoesData] = await Promise.all([
             carregarPerguntas(),
@@ -34,34 +40,69 @@ async function carregarFormulario() {
         
     } catch (error) {
         console.error('Erro ao carregar formulário:', error);
-        showError('Erro ao carregar o formulário. Verifique sua conexão e tente novamente.');
+        showError('Erro ao carregar o formulário: ' + error.message);
+    }
+}
+
+// Testar conexão com o servidor
+async function testarConexao() {
+    try {
+        const response = await fetch(SCRIPT_URL);
+        const text = await response.text();
+        console.log('Teste de conexão:', response.status, text.substring(0, 100) + '...');
+        return response.ok;
+    } catch (error) {
+        console.error('Erro no teste de conexão:', error);
+        return false;
     }
 }
 
 // Carregar perguntas do Google Apps Script
 async function carregarPerguntas() {
-    const response = await fetch(`${SCRIPT_URL}?action=getPerguntas`);
-    if (!response.ok) {
-        throw new Error('Erro ao carregar perguntas');
+    try {
+        const response = await fetch(`${SCRIPT_URL}?action=getPerguntas`);
+        if (!response.ok) {
+            throw new Error('Erro ao carregar perguntas: ' + response.status);
+        }
+        const data = await response.json();
+        
+        if (!data.success) {
+            throw new Error(data.error || 'Erro ao carregar perguntas');
+        }
+        
+        return data.perguntas || [];
+    } catch (error) {
+        console.error('Erro em carregarPerguntas:', error);
+        throw error;
     }
-    const data = await response.json();
-    return data.perguntas || [];
 }
 
 // Carregar configurações do Google Apps Script
 async function carregarConfiguracoes() {
-    const response = await fetch(`${SCRIPT_URL}?action=getConfiguracoes`);
-    if (!response.ok) {
-        throw new Error('Erro ao carregar configurações');
+    try {
+        const response = await fetch(`${SCRIPT_URL}?action=getConfiguracoes`);
+        if (!response.ok) {
+            throw new Error('Erro ao carregar configurações: ' + response.status);
+        }
+        const data = await response.json();
+        
+        if (!data.success) {
+            throw new Error(data.error || 'Erro ao carregar configurações');
+        }
+        
+        return data.configuracoes || [];
+    } catch (error) {
+        console.error('Erro em carregarConfiguracoes:', error);
+        throw error;
     }
-    const data = await response.json();
-    return data.configuracoes || [];
 }
 
 // Renderizar o formulário dinamicamente
 function renderizarFormulario() {
     const container = document.getElementById('questionsContainer');
     container.innerHTML = '';
+    
+    console.log('Renderizando formulário com', perguntas.length, 'perguntas');
     
     perguntas.forEach((pergunta, index) => {
         const questionBlock = criarBlocoPergunta(pergunta, index);
@@ -74,6 +115,7 @@ function renderizarFormulario() {
         if (primeiroSelect) {
             primeiroSelect.addEventListener('change', function() {
                 turmaSelecionada = this.value;
+                console.log('Turma selecionada:', turmaSelecionada);
                 aplicarRestricoesPorTurma();
             });
         }
@@ -111,6 +153,8 @@ function criarBlocoPergunta(pergunta, index) {
         case 'Checkbox':
             inputContainer.appendChild(criarCheckboxGroup(pergunta));
             break;
+        default:
+            console.warn('Tipo de pergunta desconhecido:', pergunta.Tipo);
     }
     
     questionBlock.appendChild(title);
@@ -124,6 +168,7 @@ function criarInputTexto(pergunta) {
     const input = document.createElement('input');
     input.type = 'text';
     input.name = pergunta.ID;
+    input.id = pergunta.ID;
     input.className = 'text-input';
     input.placeholder = 'Digite sua resposta...';
     input.required = pergunta.Obrigatoria === 'Sim';
@@ -135,6 +180,7 @@ function criarInputTexto(pergunta) {
 function criarDropdown(pergunta) {
     const select = document.createElement('select');
     select.name = pergunta.ID;
+    select.id = pergunta.ID;
     select.className = 'dropdown-select';
     select.required = pergunta.Obrigatoria === 'Sim';
     
@@ -142,6 +188,8 @@ function criarDropdown(pergunta) {
     const defaultOption = document.createElement('option');
     defaultOption.value = '';
     defaultOption.textContent = 'Selecione uma opção...';
+    defaultOption.disabled = true;
+    defaultOption.selected = true;
     select.appendChild(defaultOption);
     
     // Adicionar opções
@@ -241,12 +289,16 @@ function criarCheckboxGroup(pergunta) {
 function aplicarRestricoesPorTurma() {
     if (!turmaSelecionada) return;
     
+    console.log('Aplicando restrições para turma:', turmaSelecionada);
+    
     // Obter restrições para a turma selecionada
     const restricoes = configuracoes.filter(config => 
         config.Tipo === 'Restricao' && 
         config.Identificador === turmaSelecionada &&
         config.Status === 'Ativo'
     );
+    
+    console.log('Restrições encontradas:', restricoes.length);
     
     // Mostrar todas as perguntas primeiro
     perguntas.forEach(pergunta => {
@@ -265,13 +317,14 @@ function aplicarRestricoesPorTurma() {
                 questionBlock.classList.add('hidden');
                 
                 // Limpar valores dos campos ocultos
-                const inputs = questionBlock.querySelectorAll('input, select');
+                const inputs = questionBlock.querySelectorAll('input, select, textarea');
                 inputs.forEach(input => {
                     if (input.type === 'radio' || input.type === 'checkbox') {
                         input.checked = false;
                     } else {
                         input.value = '';
                     }
+                    input.required = false;
                 });
             }
         }
@@ -283,14 +336,13 @@ function obterLimiteOpcao(pergunta, opcao) {
     const limite = configuracoes.find(config => 
         config.Tipo === 'Limite' && 
         config.Pergunta === pergunta &&
-        config.Opcao === opcao &&
-        config.Status === 'Ativo'
+        config.Opcao === opcao
     );
     
     if (limite) {
         return {
             limite: parseInt(limite.Valor),
-            esgotado: limite.Valor === '0' || limite.Status === 'Esgotado'
+            esgotado: limite.Status === 'Esgotado'
         };
     }
     
@@ -302,12 +354,20 @@ async function enviarFormulario(event) {
     event.preventDefault();
     
     const submitBtn = document.getElementById('submitBtn');
+    const originalText = submitBtn.innerHTML;
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<span class="material-icons">hourglass_empty</span> Enviando...';
     
     try {
         // Coletar dados do formulário
         const formData = coletarDadosFormulario();
+        console.log('Dados a serem enviados:', formData);
+        
+        // Validar dados obrigatórios
+        const validacao = validarFormulario(formData);
+        if (!validacao.valido) {
+            throw new Error(validacao.mensagem || 'Por favor, preencha todos os campos obrigatórios.');
+        }
         
         // Enviar para o Google Apps Script
         const response = await fetch(SCRIPT_URL, {
@@ -318,26 +378,53 @@ async function enviarFormulario(event) {
             body: JSON.stringify(formData)
         });
         
+        console.log('Resposta do servidor - Status:', response.status);
+        
         if (!response.ok) {
-            throw new Error('Erro ao enviar formulário');
+            throw new Error(`Erro HTTP: ${response.status} ${response.statusText}`);
         }
         
         const result = await response.json();
+        console.log('Resultado do servidor:', result);
         
         if (result.success) {
             showSuccess();
         } else {
-            throw new Error(result.error || 'Erro desconhecido');
+            throw new Error(result.error || 'Erro desconhecido ao processar resposta');
         }
         
     } catch (error) {
         console.error('Erro ao enviar formulário:', error);
-        showError('Erro ao enviar as respostas. Tente novamente.');
+        showError('Erro ao enviar as respostas: ' + error.message);
         
         // Reabilitar botão
         submitBtn.disabled = false;
-        submitBtn.innerHTML = '<span class="material-icons">send</span> Enviar Respostas';
+        submitBtn.innerHTML = originalText;
     }
+}
+
+// Validar formulário antes do envio
+function validarFormulario(formData) {
+    for (const pergunta of perguntas) {
+        // Pular perguntas ocultas
+        const questionBlock = document.getElementById(`question-${pergunta.ID}`);
+        if (questionBlock && questionBlock.classList.contains('hidden')) {
+            continue;
+        }
+        
+        // Verificar campos obrigatórios
+        if (pergunta.Obrigatoria === 'Sim') {
+            const valor = formData.respostas[pergunta.ID];
+            if (!valor || valor.toString().trim() === '') {
+                return {
+                    valido: false,
+                    mensagem: `Por favor, preencha o campo: "${pergunta['Texto da Pergunta']}"`
+                };
+            }
+        }
+    }
+    
+    return { valido: true };
 }
 
 // Coletar dados do formulário
@@ -352,28 +439,40 @@ function coletarDadosFormulario() {
         
         // Pular perguntas ocultas
         if (questionBlock && questionBlock.classList.contains('hidden')) {
+            console.log(`Pergunta ${pergunta.ID} oculta, pulando`);
+            formData.respostas[pergunta.ID] = '';
             return;
         }
         
-        const inputs = document.querySelectorAll(`[name="${pergunta.ID}"]`);
+        let value = '';
         
-        if (pergunta.Tipo === 'Checkbox') {
-            // Para checkboxes, coletar todas as opções selecionadas
-            const selecionados = [];
-            inputs.forEach(input => {
-                if (input.checked) {
-                    selecionados.push(input.value);
-                }
-            });
-            formData.respostas[pergunta.ID] = selecionados.join(', ');
-        } else if (pergunta.Tipo === 'Radio') {
-            // Para radio buttons, pegar o selecionado
-            const selecionado = Array.from(inputs).find(input => input.checked);
-            formData.respostas[pergunta.ID] = selecionado ? selecionado.value : '';
-        } else {
-            // Para texto e dropdown
-            formData.respostas[pergunta.ID] = inputs[0] ? inputs[0].value : '';
+        try {
+            if (pergunta.Tipo === 'Checkbox') {
+                // Para checkboxes, coletar todas as opções selecionadas
+                const selecionados = [];
+                const checkboxes = document.querySelectorAll(`input[name="${pergunta.ID}"]:checked`);
+                checkboxes.forEach(checkbox => {
+                    selecionados.push(checkbox.value);
+                });
+                value = selecionados.join(', ');
+                
+            } else if (pergunta.Tipo === 'Radio') {
+                // Para radio buttons, pegar o selecionado
+                const radioSelecionado = document.querySelector(`input[name="${pergunta.ID}"]:checked`);
+                value = radioSelecionado ? radioSelecionado.value : '';
+                
+            } else {
+                // Para texto e dropdown
+                const input = document.querySelector(`[name="${pergunta.ID}"]`);
+                value = input ? input.value : '';
+            }
+        } catch (error) {
+            console.error(`Erro ao coletar dados da pergunta ${pergunta.ID}:`, error);
+            value = '';
         }
+        
+        formData.respostas[pergunta.ID] = value;
+        console.log(`Pergunta ${pergunta.ID} (${pergunta['Texto da Pergunta']}):`, value);
     });
     
     return formData;
@@ -398,6 +497,8 @@ function showForm() {
 function showSuccess() {
     document.getElementById('dynamicForm').style.display = 'none';
     document.getElementById('successMessage').style.display = 'block';
+    document.getElementById('loadingContainer').style.display = 'none';
+    document.getElementById('errorMessage').style.display = 'none';
 }
 
 function showError(message) {
@@ -405,5 +506,43 @@ function showError(message) {
     document.getElementById('dynamicForm').style.display = 'none';
     document.getElementById('errorText').textContent = message;
     document.getElementById('errorMessage').style.display = 'block';
+    document.getElementById('successMessage').style.display = 'none';
 }
 
+// Função de debug para teste
+function debugForm() {
+    console.log('=== DEBUG DO FORMULÁRIO ===');
+    console.log('Perguntas:', perguntas);
+    console.log('Configurações:', configuracoes);
+    console.log('Turma selecionada:', turmaSelecionada);
+    console.log('Dados coletados:', coletarDadosFormulario());
+    
+    // Testar conexão
+    testarConexao().then(result => {
+        console.log('Conexão testada:', result);
+    });
+    
+    // Testar endpoint de perguntas
+    fetch(`${SCRIPT_URL}?action=getPerguntas`)
+        .then(response => response.json())
+        .then(data => console.log('Resposta getPerguntas:', data))
+        .catch(error => console.error('Erro getPerguntas:', error));
+}
+
+// Adicionar botão de debug se não existir
+if (!document.getElementById('debugButton')) {
+    const debugBtn = document.createElement('button');
+    debugBtn.id = 'debugButton';
+    debugBtn.textContent = 'Debug';
+    debugBtn.style.position = 'fixed';
+    debugBtn.style.top = '10px';
+    debugBtn.style.right = '10px';
+    debugBtn.style.zIndex = '1000';
+    debugBtn.style.padding = '5px 10px';
+    debugBtn.style.background = '#f0f0f0';
+    debugBtn.style.border = '1px solid #ccc';
+    debugBtn.style.borderRadius = '3px';
+    debugBtn.style.cursor = 'pointer';
+    debugBtn.onclick = debugForm;
+    document.body.appendChild(debugBtn);
+}

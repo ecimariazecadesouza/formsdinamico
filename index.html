@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulário Dinâmico</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="form-header">
+            <h1 class="form-title">Formulário Dinâmico</h1>
+            <p class="form-description">Preencha as informações solicitadas abaixo</p>
+        </div>
+
+        <div class="loading-container" id="loadingContainer">
+            <div class="loading-spinner"></div>
+            <p>Carregando formulário...</p>
+        </div>
+
+        <form id="dynamicForm" class="dynamic-form" style="display: none;">
+            <div id="questionsContainer" class="questions-container">
+                <!-- As perguntas serão inseridas dinamicamente aqui -->
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    <span class="material-icons">send</span>
+                    Enviar Respostas
+                </button>
+            </div>
+        </form>
+
+        <div class="success-message" id="successMessage" style="display: none;">
+            <div class="success-icon">
+                <span class="material-icons">check_circle</span>
+            </div>
+            <h2>Respostas enviadas com sucesso!</h2>
+            <p>Obrigado por participar. Suas respostas foram registradas.</p>
+        </div>
+
+        <div class="error-message" id="errorMessage" style="display: none;">
+            <div class="error-icon">
+                <span class="material-icons">error</span>
+            </div>
+            <h2>Erro ao enviar respostas</h2>
+            <p id="errorText">Ocorreu um erro inesperado. Tente novamente.</p>
+            <button class="retry-btn" onclick="location.reload()">Tentar Novamente</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+

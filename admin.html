@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo - Formulário Dinâmico</title>
+    <link rel="stylesheet" href="admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Header -->
+        <header class="admin-header">
+            <div class="header-content">
+                <h1 class="admin-title">
+                    <span class="material-icons">dashboard</span>
+                    Painel Administrativo
+                </h1>
+                <div class="header-actions">
+                    <button class="refresh-btn" id="refreshBtn">
+                        <span class="material-icons">refresh</span>
+                        Atualizar Dados
+                    </button>
+                    <button class="export-btn" id="exportBtn">
+                        <span class="material-icons">download</span>
+                        Exportar CSV
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Loading -->
+        <div class="loading-container" id="loadingContainer">
+            <div class="loading-spinner"></div>
+            <p>Carregando dados...</p>
+        </div>
+
+        <!-- Main Content -->
+        <main class="admin-main" id="adminMain" style="display: none;">
+            <!-- Statistics Cards -->
+            <section class="stats-section">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <span class="material-icons">assignment</span>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-number" id="totalRespostas">0</h3>
+                            <p class="stat-label">Total de Respostas</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <span class="material-icons">today</span>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-number" id="respostasHoje">0</h3>
+                            <p class="stat-label">Respostas Hoje</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <span class="material-icons">groups</span>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-number" id="totalTurmas">0</h3>
+                            <p class="stat-label">Turmas Participantes</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <span class="material-icons">trending_up</span>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-number" id="mediaRespostas">0</h3>
+                            <p class="stat-label">Média por Dia</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Filters Section -->
+            <section class="filters-section">
+                <div class="filters-header">
+                    <h2>
+                        <span class="material-icons">filter_list</span>
+                        Filtros
+                    </h2>
+                    <button class="clear-filters-btn" id="clearFiltersBtn">
+                        <span class="material-icons">clear</span>
+                        Limpar Filtros
+                    </button>
+                </div>
+                
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label for="filterTurma">Turma:</label>
+                        <select id="filterTurma" class="filter-select">
+                            <option value="">Todas as turmas</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="filterDataInicio">Data Início:</label>
+                        <input type="date" id="filterDataInicio" class="filter-input">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="filterDataFim">Data Fim:</label>
+                        <input type="date" id="filterDataFim" class="filter-input">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="filterPergunta">Pergunta:</label>
+                        <select id="filterPergunta" class="filter-select">
+                            <option value="">Todas as perguntas</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Charts Section -->
+            <section class="charts-section">
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3>Distribuição por Turma</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="turmasChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3>Respostas por Dia</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="timelineChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Data Table Section -->
+            <section class="table-section">
+                <div class="table-header">
+                    <h2>
+                        <span class="material-icons">table_view</span>
+                        Respostas Detalhadas
+                    </h2>
+                    <div class="table-actions">
+                        <div class="search-box">
+                            <span class="material-icons">search</span>
+                            <input type="text" id="searchInput" placeholder="Buscar nas respostas...">
+                        </div>
+                        <select id="pageSize" class="page-size-select">
+                            <option value="10">10 por página</option>
+                            <option value="25" selected>25 por página</option>
+                            <option value="50">50 por página</option>
+                            <option value="100">100 por página</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table" id="dataTable">
+                        <thead>
+                            <tr id="tableHeader">
+                                <!-- Cabeçalhos serão inseridos dinamicamente -->
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <!-- Dados serão inseridos dinamicamente -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="pagination-container">
+                    <div class="pagination-info" id="paginationInfo">
+                        Mostrando 0 de 0 registros
+                    </div>
+                    <div class="pagination-controls" id="paginationControls">
+                        <!-- Controles de paginação serão inseridos dinamicamente -->
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Error Message -->
+        <div class="error-message" id="errorMessage" style="display: none;">
+            <div class="error-icon">
+                <span class="material-icons">error</span>
+            </div>
+            <h2>Erro ao carregar dados</h2>
+            <p id="errorText">Ocorreu um erro inesperado. Verifique sua conexão e tente novamente.</p>
+            <button class="retry-btn" onclick="location.reload()">Tentar Novamente</button>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>
+

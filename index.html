@@ -6,220 +6,37 @@
     <title>Formulário Dinâmico</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-            color: #333;
-            line-height: 1.6;
-            min-height: 100vh;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .container {
-            max-width: 800px;
-            width: 100%;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            overflow: hidden;
-        }
-
-        .form-header {
-            background: linear-gradient(135deg, #3a7bd5, #00d2ff);
-            color: white;
-            padding: 25px;
-            text-align: center;
-        }
-
-        .form-title {
-            font-size: 28px;
-            margin-bottom: 8px;
-            font-weight: 700;
-        }
-
-        .form-description {
-            font-size: 16px;
-            opacity: 0.9;
-        }
-
-        .loading-container {
-            padding: 40px;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #3498db;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .dynamic-form {
-            padding: 25px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-            padding: 15px;
-            border-radius: 10px;
-            background: #f8f9fa;
-            border-left: 4px solid #3a7bd5;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: #3a7bd5;
-            box-shadow: 0 0 0 3px rgba(58, 123, 213, 0.2);
-        }
-
-        .radio-group, .checkbox-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .radio-option, .checkbox-option {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .form-actions {
-            text-align: center;
-            margin-top: 30px;
-            padding: 20px;
-        }
-
-        .submit-btn {
-            background: linear-gradient(135deg, #3a7bd5, #00d2ff);
-            color: white;
-            border: none;
-            padding: 14px 30px;
-            font-size: 18px;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: transform 0.3s, box-shadow 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 4px 15px rgba(0, 210, 255, 0.3);
-        }
-
-        .submit-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 210, 255, 0.4);
-        }
-
-        .submit-btn:active {
-            transform: translateY(0);
-        }
-
-        .success-message, .error-message {
-            text-align: center;
-            padding: 40px;
-        }
-
-        .success-icon, .error-icon {
-            font-size: 60px;
-            margin-bottom: 20px;
-        }
-
-        .success-icon {
-            color: #28a745;
-        }
-
-        .error-icon {
-            color: #dc3545;
-        }
-
-        .success-message h2, .error-message h2 {
-            margin-bottom: 15px;
-            color: #2c3e50;
-        }
-
-        .retry-btn {
-            background: #3a7bd5;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 6px;
-            cursor: pointer;
-            margin-top: 20px;
-            font-size: 16px;
-            transition: background 0.3s;
-        }
-
-        .retry-btn:hover {
-            background: #2c5fa1;
-        }
-
-        .required-field::after {
-            content: " *";
-            color: #dc3545;
-        }
-
-        .info-text {
-            font-size: 14px;
-            color: #6c757d;
-            margin-top: 5px;
-        }
-
-        /* Responsividade */
-        @media (max-width: 600px) {
-            .container {
-                border-radius: 10px;
-            }
-            
-            .form-title {
-                font-size: 24px;
-            }
-            
-            .form-group {
-                padding: 12px;
-            }
-            
-            .submit-btn {
-                width: 100%;
-                justify-content: center;
-            }
-        }
+        /* Estilos CSS permanecem os mesmos do arquivo original */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100% ); color: #333; line-height: 1.6; min-height: 100vh; padding: 20px; display: flex; justify-content: center; align-items: center; }
+        .container { max-width: 800px; width: 100%; background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); overflow: hidden; }
+        .form-header { background: linear-gradient(135deg, #3a7bd5, #00d2ff); color: white; padding: 25px; text-align: center; }
+        .form-title { font-size: 28px; margin-bottom: 8px; font-weight: 700; }
+        .form-description { font-size: 16px; opacity: 0.9; }
+        .loading-container { padding: 40px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .loading-spinner { width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid #3498db; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .dynamic-form { padding: 25px; }
+        .form-group { margin-bottom: 20px; padding: 15px; border-radius: 10px; background: #f8f9fa; border-left: 4px solid #3a7bd5; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50; }
+        .form-control { width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 16px; transition: border-color 0.3s; }
+        .form-control:focus { outline: none; border-color: #3a7bd5; box-shadow: 0 0 0 3px rgba(58, 123, 213, 0.2); }
+        .radio-group, .checkbox-group { display: flex; flex-direction: column; gap: 10px; }
+        .radio-option, .checkbox-option { display: flex; align-items: center; gap: 10px; }
+        .form-actions { text-align: center; margin-top: 30px; padding: 20px; }
+        .submit-btn { background: linear-gradient(135deg, #3a7bd5, #00d2ff); color: white; border: none; padding: 14px 30px; font-size: 18px; border-radius: 50px; cursor: pointer; transition: transform 0.3s, box-shadow 0.3s; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 4px 15px rgba(0, 210, 255, 0.3); }
+        .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 210, 255, 0.4); }
+        .submit-btn:active { transform: translateY(0); }
+        .success-message, .error-message { text-align: center; padding: 40px; }
+        .success-icon, .error-icon { font-size: 60px; margin-bottom: 20px; }
+        .success-icon { color: #28a745; }
+        .error-icon { color: #dc3545; }
+        .success-message h2, .error-message h2 { margin-bottom: 15px; color: #2c3e50; }
+        .retry-btn { background: #3a7bd5; color: white; border: none; padding: 12px 25px; border-radius: 6px; cursor: pointer; margin-top: 20px; font-size: 16px; transition: background 0.3s; }
+        .retry-btn:hover { background: #2c5fa1; }
+        .required-field::after { content: " *"; color: #dc3545; }
+        .info-text { font-size: 14px; color: #6c757d; margin-top: 5px; }
+        @media (max-width: 600px) { .container { border-radius: 10px; } .form-title { font-size: 24px; } .form-group { padding: 12px; } .submit-btn { width: 100%; justify-content: center; } }
     </style>
 </head>
 <body>
@@ -235,10 +52,7 @@
         </div>
 
         <form id="dynamicForm" class="dynamic-form" style="display: none;">
-            <div id="questionsContainer" class="questions-container">
-                <!-- As perguntas serão inseridas dinamicamente aqui -->
-            </div>
-
+            <div id="questionsContainer" class="questions-container"></div>
             <div class="form-actions">
                 <button type="submit" class="submit-btn" id="submitBtn">
                     <i class="fas fa-paper-plane"></i>
@@ -248,17 +62,13 @@
         </form>
 
         <div class="success-message" id="successMessage" style="display: none;">
-            <div class="success-icon">
-                <i class="fas fa-check-circle"></i>
-            </div>
+            <div class="success-icon"><i class="fas fa-check-circle"></i></div>
             <h2>Respostas enviadas com sucesso!</h2>
             <p>Obrigado por participar. Suas respostas foram registradas.</p>
         </div>
 
         <div class="error-message" id="errorMessage" style="display: none;">
-            <div class="error-icon">
-                <i class="fas fa-exclamation-circle"></i>
-            </div>
+            <div class="error-icon"><i class="fas fa-exclamation-circle"></i></div>
             <h2>Erro ao enviar respostas</h2>
             <p id="errorText">Ocorreu um erro inesperado. Tente novamente.</p>
             <button class="retry-btn" onclick="location.reload()">Tentar Novamente</button>
@@ -266,11 +76,11 @@
     </div>
 
     <script>
-        // URL do Google Apps Script Web App - SUBSTITUA pela sua URL
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz7dJ9RnYc7m55HF088tlPXjoJYzhlOoq1OBxQln1V5XE9hbeV0yTQXL9n_vfK0Sqdu/exec';
+        // URL do Google Apps Script - SUBSTITUA pela sua URL
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbziO_U4P0DrOl3pmHLX90hip5Zel8-Ca8pPzEGm8AQfDzL8I3EymcW4-RsQOujc3Yi4/exec';
 
         // Elementos do DOM
-        const loadingContainer = document.getElementById('loadingContainer');
+        const loadingContainer = document.getElementById('loadingContainer' );
         const dynamicForm = document.getElementById('dynamicForm');
         const questionsContainer = document.getElementById('questionsContainer');
         const successMessage = document.getElementById('successMessage');
@@ -278,33 +88,27 @@
         const errorText = document.getElementById('errorText');
         const submitBtn = document.getElementById('submitBtn');
 
-        // Variáveis globais
         let perguntas = [];
         let configuracoes = [];
 
-        // Inicialização
-        document.addEventListener('DOMContentLoaded', function() {
-            carregarFormulario();
-        });
+        document.addEventListener('DOMContentLoaded', carregarFormulario);
 
-        // Carregar perguntas e configurações
         async function carregarFormulario() {
             try {
-                // Carregar perguntas e configurações simultaneamente
                 const [perguntasResponse, configuracoesResponse] = await Promise.all([
                     fetch(`${SCRIPT_URL}?action=getPerguntas`),
                     fetch(`${SCRIPT_URL}?action=getConfiguracoes`)
                 ]);
 
                 if (!perguntasResponse.ok || !configuracoesResponse.ok) {
-                    throw new Error('Erro ao carregar dados do formulário');
+                    throw new Error('Falha ao buscar dados do servidor.');
                 }
 
                 const perguntasData = await perguntasResponse.json();
                 const configuracoesData = await configuracoesResponse.json();
 
                 if (!perguntasData.success || !configuracoesData.success) {
-                    throw new Error('Dados do formulário inválidos');
+                    throw new Error(perguntasData.error || configuracoesData.error || 'Dados do formulário inválidos.');
                 }
 
                 perguntas = perguntasData.perguntas;
@@ -312,40 +116,31 @@
 
                 renderizarPerguntas();
                 
-                // Esconder loading e mostrar formulário
                 loadingContainer.style.display = 'none';
                 dynamicForm.style.display = 'block';
             } catch (error) {
                 console.error('Erro ao carregar formulário:', error);
                 loadingContainer.innerHTML = `
-                    <div class="error-icon">
-                        <i class="fas fa-exclamation-triangle"></i>
-                    </div>
+                    <div class="error-icon"><i class="fas fa-exclamation-triangle"></i></div>
                     <h3>Erro ao carregar formulário</h3>
-                    <p>${error.message || 'Verifique sua conexão e tente novamente'}</p>
+                    <p>${error.message || 'Verifique sua conexão e tente novamente.'}</p>
                     <button class="retry-btn" onclick="location.reload()">Recarregar</button>
                 `;
             }
         }
 
-        // Renderizar perguntas na tela
         function renderizarPerguntas() {
             questionsContainer.innerHTML = '';
-            
-            perguntas.forEach((pergunta, index) => {
+            perguntas.forEach(pergunta => {
                 const formGroup = document.createElement('div');
                 formGroup.className = 'form-group';
                 
                 const label = document.createElement('label');
                 label.htmlFor = pergunta.ID;
                 label.innerHTML = pergunta['Texto da Pergunta'];
-                if (pergunta.Obrigatoria === 'Sim') {
-                    label.classList.add('required-field');
-                }
-                
+                if (pergunta.Obrigatoria === 'Sim') label.classList.add('required-field');
                 formGroup.appendChild(label);
                 
-                // Adicionar campo baseado no tipo
                 switch (pergunta.Tipo) {
                     case 'Texto':
                         const input = document.createElement('input');
@@ -353,125 +148,87 @@
                         input.id = pergunta.ID;
                         input.name = pergunta.ID;
                         input.className = 'form-control';
-                        if (pergunta.Obrigatoria === 'Sim') {
-                            input.required = true;
-                        }
+                        if (pergunta.Obrigatoria === 'Sim') input.required = true;
                         formGroup.appendChild(input);
                         break;
-                        
                     case 'Dropdown':
                         const select = document.createElement('select');
                         select.id = pergunta.ID;
                         select.name = pergunta.ID;
                         select.className = 'form-control';
-                        if (pergunta.Obrigatoria === 'Sim') {
-                            select.required = true;
-                        }
-                        
-                        // Adicionar opção padrão
-                        const defaultOption = document.createElement('option');
-                        defaultOption.value = '';
-                        defaultOption.textContent = 'Selecione uma opção';
-                        select.appendChild(defaultOption);
-                        
-                        // Adicionar opções
+                        if (pergunta.Obrigatoria === 'Sim') select.required = true;
+                        select.innerHTML = '<option value="">Selecione uma opção</option>';
                         if (pergunta.Opcoes) {
-                            const opcoes = pergunta.Opcoes.split(',');
-                            opcoes.forEach(opcao => {
+                            pergunta.Opcoes.split(',').forEach(opcao => {
                                 const option = document.createElement('option');
                                 option.value = opcao.trim();
                                 option.textContent = opcao.trim();
                                 select.appendChild(option);
                             });
                         }
-                        
                         formGroup.appendChild(select);
                         break;
-                        
                     case 'Radio':
                         const radioGroup = document.createElement('div');
                         radioGroup.className = 'radio-group';
-                        
                         if (pergunta.Opcoes) {
-                            const opcoes = pergunta.Opcoes.split(',');
-                            opcoes.forEach(opcao => {
+                            pergunta.Opcoes.split(',').forEach(opcao => {
                                 const optionDiv = document.createElement('div');
                                 optionDiv.className = 'radio-option';
-                                
                                 const radio = document.createElement('input');
                                 radio.type = 'radio';
                                 radio.id = `${pergunta.ID}_${opcao.trim()}`;
                                 radio.name = pergunta.ID;
                                 radio.value = opcao.trim();
-                                if (pergunta.Obrigatoria === 'Sim') {
-                                    radio.required = true;
-                                }
-                                
+                                if (pergunta.Obrigatoria === 'Sim') radio.required = true;
                                 const radioLabel = document.createElement('label');
-                                radioLabel.htmlFor = `${pergunta.ID}_${opcao.trim()}`;
+                                radioLabel.htmlFor = radio.id;
                                 radioLabel.textContent = opcao.trim();
-                                
-                                optionDiv.appendChild(radio);
-                                optionDiv.appendChild(radioLabel);
+                                optionDiv.append(radio, radioLabel);
                                 radioGroup.appendChild(optionDiv);
                             });
                         }
-                        
                         formGroup.appendChild(radioGroup);
                         break;
-                        
                     case 'Checkbox':
                         const checkboxGroup = document.createElement('div');
                         checkboxGroup.className = 'checkbox-group';
-                        
                         if (pergunta.Opcoes) {
-                            const opcoes = pergunta.Opcoes.split(',');
-                            opcoes.forEach(opcao => {
+                            pergunta.Opcoes.split(',').forEach(opcao => {
                                 const optionDiv = document.createElement('div');
                                 optionDiv.className = 'checkbox-option';
-                                
                                 const checkbox = document.createElement('input');
                                 checkbox.type = 'checkbox';
                                 checkbox.id = `${pergunta.ID}_${opcao.trim()}`;
                                 checkbox.name = pergunta.ID;
                                 checkbox.value = opcao.trim();
-                                
                                 const checkboxLabel = document.createElement('label');
-                                checkboxLabel.htmlFor = `${pergunta.ID}_${opcao.trim()}`;
+                                checkboxLabel.htmlFor = checkbox.id;
                                 checkboxLabel.textContent = opcao.trim();
-                                
-                                optionDiv.appendChild(checkbox);
-                                optionDiv.appendChild(checkboxLabel);
+                                optionDiv.append(checkbox, checkboxLabel);
                                 checkboxGroup.appendChild(optionDiv);
                             });
                         }
-                        
                         formGroup.appendChild(checkboxGroup);
                         break;
                 }
                 
-                // Adicionar texto de ajuda se for obrigatório
                 if (pergunta.Obrigatoria === 'Sim') {
                     const infoText = document.createElement('p');
                     infoText.className = 'info-text';
                     infoText.textContent = 'Este campo é obrigatório';
                     formGroup.appendChild(infoText);
                 }
-                
                 questionsContainer.appendChild(formGroup);
             });
         }
 
-        // Manipular envio do formulário
         dynamicForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            // Coletar respostas
             const formData = new FormData(dynamicForm);
             const respostas = {};
-            
             for (const [key, value] of formData.entries()) {
-                // Para checkboxes, agrupar valores
                 if (respostas[key]) {
                     respostas[key] = `${respostas[key]}, ${value}`;
                 } else {
@@ -479,14 +236,14 @@
                 }
             }
             
-            // Validar respostas obrigatórias
             let formularioValido = true;
             perguntas.forEach(pergunta => {
                 if (pergunta.Obrigatoria === 'Sim' && !respostas[pergunta.ID]) {
                     formularioValido = false;
-                    const element = document.getElementById(pergunta.ID);
+                    const element = document.getElementById(pergunta.ID) || document.querySelector(`[name="${pergunta.ID}"]`);
                     if (element) {
-                        element.style.borderColor = '#dc3545';
+                        const formGroup = element.closest('.form-group');
+                        if (formGroup) formGroup.style.borderColor = '#dc3545';
                     }
                 }
             });
@@ -496,27 +253,34 @@
                 return;
             }
             
-            // Enviar respostas
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+            
             try {
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
-                
-                const response = await fetch(SCRIPT_URL, {
+                // *** MUDANÇA PRINCIPAL AQUI (ETAPA 2) ***
+                // A requisição agora é um POST, mas para uma URL com um parâmetro 'action'.
+                // Isso faz com que a requisição seja tratada pelo doGet no Apps Script,
+                // que por sua vez chama a função de salvamento e retorna um JSON limpo.
+                const response = await fetch(`${SCRIPT_URL}?action=submitForm`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'text/plain', // Enviando como texto para ser parseado no Apps Script
                     },
-                    body: JSON.stringify({ respostas })
+                    body: JSON.stringify({ respostas }) // O corpo da requisição contém os dados
                 });
                 
+                if (!response.ok) {
+                    throw new Error(`Erro do servidor: ${response.statusText}`);
+                }
+
                 const result = await response.json();
                 
                 if (result.success) {
-                    // Sucesso
                     dynamicForm.style.display = 'none';
                     successMessage.style.display = 'block';
                 } else {
-                    throw new Error(result.error || 'Erro ao enviar respostas');
+                    // Lança um erro com a mensagem vinda do servidor (ex: "vagas esgotadas")
+                    throw new Error(result.error || 'Ocorreu um erro ao processar sua resposta.');
                 }
             } catch (error) {
                 console.error('Erro ao enviar formulário:', error);

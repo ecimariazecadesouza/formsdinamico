@@ -1,6 +1,6 @@
 // Configuração da URL do Google Apps Script
 // IMPORTANTE: Substitua pela mesma URL usada no formulário
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxOU94PHfTHOXn-c-xpFCrGEQQUOA0OfiW9f_vt88agU7E8P9lKo4XLg67Ctk1TzG-E/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzq789ichA-ODURHYaORVZdBV-n2TvS09hOfqtfL8aAK_XC8Lr_nOCB7h22RhAlbhdA/exec";
 
 // Variáveis globais
 let todasRespostas = [];

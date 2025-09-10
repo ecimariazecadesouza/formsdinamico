@@ -36,7 +36,8 @@
         .retry-btn:hover { background: #2c5fa1; }
         .required-field::after { content: " *"; color: #dc3545; }
         .info-text { font-size: 14px; color: #6c757d; margin-top: 5px; }
-        @media (max-width: 600px) { .container { border-radius: 10px; } .form-title { font-size: 24px; } .form-group { padding: 12px; } .submit-btn { width: 100%; justify-content: center; } }
+        /* Estilo para ocultar perguntas */
+        .hidden-question { display: none; }
     </style>
 </head>
 <body>
@@ -77,7 +78,7 @@
 
     <script>
         // URL do Google Apps Script - SUBSTITUA pela sua URL
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwn5N68CO8pMmQymocOveZQnHEcu-h0yKB2QVgSHBjwgcvRtS0LGd2HoC7AApNuI_QM/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzq789ichA-ODURHYaORVZdBV-n2TvS09hOfqtfL8aAK_XC8Lr_nOCB7h22RhAlbhdA/exec'; // ATUALIZE ESTA URL!
 
         // Elementos do DOM
         const loadingContainer = document.getElementById('loadingContainer' );
@@ -90,31 +91,40 @@
 
         let perguntas = [];
         let configuracoes = [];
+        let restricoesVisibilidade = []; // *** NOVO ***: Para armazenar as restrições de visibilidade
+        let perguntasMap = new Map(); // *** NOVO ***: Para mapear perguntas por ID
 
         document.addEventListener('DOMContentLoaded', carregarFormulario);
 
         async function carregarFormulario() {
             try {
-                const [perguntasResponse, configuracoesResponse] = await Promise.all([
+                const [perguntasResponse, configuracoesResponse, restricoesResponse] = await Promise.all([
                     fetch(`${SCRIPT_URL}?action=getPerguntas`),
-                    fetch(`${SCRIPT_URL}?action=getConfiguracoes`)
+                    fetch(`${SCRIPT_URL}?action=getConfiguracoes`),
+                    fetch(`${SCRIPT_URL}?action=getRestricoesVisibilidade`) // *** NOVO ***: Busca as restrições
                 ]);
 
-                if (!perguntasResponse.ok || !configuracoesResponse.ok) {
+                if (!perguntasResponse.ok || !configuracoesResponse.ok || !restricoesResponse.ok) {
                     throw new Error('Falha ao buscar dados do servidor.');
                 }
 
                 const perguntasData = await perguntasResponse.json();
                 const configuracoesData = await configuracoesResponse.json();
+                const restricoesData = await restricoesResponse.json(); // *** NOVO ***: Processa as restrições
 
-                if (!perguntasData.success || !configuracoesData.success) {
-                    throw new Error(perguntasData.error || configuracoesData.error || 'Dados do formulário inválidos.');
+                if (!perguntasData.success || !configuracoesData.success || !restricoesData.success) {
+                    throw new Error(perguntasData.error || configuracoesData.error || restricoesData.error || 'Dados do formulário inválidos.');
                 }
 
                 perguntas = perguntasData.perguntas;
                 configuracoes = configuracoesData.configuracoes;
+                restricoesVisibilidade = restricoesData.restricoes; // *** NOVO ***: Armazena as restrições
+
+                // *** NOVO ***: Cria um mapa de perguntas para fácil acesso
+                perguntas.forEach(p => perguntasMap.set(p.ID, p));
 
                 renderizarPerguntas();
+                adicionarListenersVisibilidade(); // *** NOVO ***: Adiciona listeners para visibilidade
                 
                 loadingContainer.style.display = 'none';
                 dynamicForm.style.display = 'block';
@@ -134,6 +144,7 @@
             perguntas.forEach(pergunta => {
                 const formGroup = document.createElement('div');
                 formGroup.className = 'form-group';
+                formGroup.id = `group-${pergunta.ID}`; // *** NOVO ***: Adiciona um ID ao grupo da pergunta
                 
                 const label = document.createElement('label');
                 label.htmlFor = pergunta.ID;
@@ -223,12 +234,69 @@
             });
         }
 
+        // *** NOVO ***: Adiciona listeners para aplicar restrições de visibilidade
+        function adicionarListenersVisibilidade() {
+            const turmaSelect = document.getElementById('P1'); // Assumindo que P1 é a pergunta da turma
+            if (turmaSelect) {
+                turmaSelect.addEventListener('change', aplicarRestricoesVisibilidade);
+                // Aplica as restrições na carga inicial, caso já haja uma turma selecionada
+                aplicarRestricoesVisibilidade(); 
+            }
+        }
+
+        // *** NOVO ***: Função para aplicar as restrições de visibilidade
+        function aplicarRestricoesVisibilidade() {
+            const turmaSelecionada = document.getElementById('P1')?.value; // Pega o valor da turma selecionada
+
+            perguntas.forEach(pergunta => {
+                const perguntaGroup = document.getElementById(`group-${pergunta.ID}`);
+                if (!perguntaGroup) return; // Se o grupo da pergunta não existe, pula
+
+                // Verifica se existe uma restrição para esta pergunta e a turma selecionada
+                const restricao = restricoesVisibilidade.find(r => 
+                    r.Identificador === turmaSelecionada && 
+                    r.Pergunta === pergunta['Texto da Pergunta']
+                );
+
+                if (restricao) {
+                    perguntaGroup.classList.add('hidden-question');
+                    // Se a pergunta for oculta, desmarca como obrigatória para evitar validação
+                    const inputElement = document.getElementById(pergunta.ID) || document.querySelector(`[name="${pergunta.ID}"]`);
+                    if (inputElement) {
+                        inputElement.required = false;
+                        // Limpa o valor do campo oculto para não enviar dados indesejados
+                        if (inputElement.type === 'text' || inputElement.tagName === 'SELECT') {
+                            inputElement.value = '';
+                        } else if (inputElement.type === 'radio' || inputElement.type === 'checkbox') {
+                            document.querySelectorAll(`[name="${pergunta.ID}"]`).forEach(el => el.checked = false);
+                        }
+                    }
+                } else {
+                    perguntaGroup.classList.remove('hidden-question');
+                    // Se a pergunta não for oculta, restaura a obrigatoriedade se ela for originalmente obrigatória
+                    const originalPergunta = perguntasMap.get(pergunta.ID); // Pega a pergunta original do mapa
+                    if (originalPergunta && originalPergunta.Obrigatoria === 'Sim') {
+                        const inputElement = document.getElementById(pergunta.ID) || document.querySelector(`[name="${pergunta.ID}"]`);
+                        if (inputElement) {
+                            inputElement.required = true;
+                        }
+                    }
+                }
+            });
+        }
+
         dynamicForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const formData = new FormData(dynamicForm);
             const respostas = {};
             for (const [key, value] of formData.entries()) {
+                // *** NOVO ***: Ignora campos de perguntas ocultas
+                const perguntaGroup = document.getElementById(`group-${key}`);
+                if (perguntaGroup && perguntaGroup.classList.contains('hidden-question')) {
+                    continue; 
+                }
+
                 if (respostas[key]) {
                     respostas[key] = `${respostas[key]}, ${value}`;
                 } else {
@@ -238,7 +306,9 @@
             
             let formularioValido = true;
             perguntas.forEach(pergunta => {
-                if (pergunta.Obrigatoria === 'Sim' && !respostas[pergunta.ID]) {
+                const perguntaGroup = document.getElementById(`group-${pergunta.ID}`);
+                // *** NOVO ***: Apenas valida perguntas visíveis e obrigatórias
+                if (pergunta.Obrigatoria === 'Sim' && !perguntaGroup.classList.contains('hidden-question') && !respostas[pergunta.ID]) {
                     formularioValido = false;
                     const element = document.getElementById(pergunta.ID) || document.querySelector(`[name="${pergunta.ID}"]`);
                     if (element) {
@@ -249,7 +319,7 @@
             });
             
             if (!formularioValido) {
-                alert('Por favor, preencha todos os campos obrigatórios.');
+                alert('Por favor, preencha todos os campos obrigatórios visíveis.');
                 return;
             }
             
@@ -257,16 +327,12 @@
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
             
             try {
-                // *** MUDANÇA PRINCIPAL AQUI (ETAPA 2) ***
-                // A requisição agora é um POST, mas para uma URL com um parâmetro 'action'.
-                // Isso faz com que a requisição seja tratada pelo doGet no Apps Script,
-                // que por sua vez chama a função de salvamento e retorna um JSON limpo.
                 const response = await fetch(`${SCRIPT_URL}?action=submitForm`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'text/plain', // Enviando como texto para ser parseado no Apps Script
+                        'Content-Type': 'text/plain',
                     },
-                    body: JSON.stringify({ respostas }) // O corpo da requisição contém os dados
+                    body: JSON.stringify({ respostas })
                 });
                 
                 if (!response.ok) {
@@ -279,7 +345,6 @@
                     dynamicForm.style.display = 'none';
                     successMessage.style.display = 'block';
                 } else {
-                    // Lança um erro com a mensagem vinda do servidor (ex: "vagas esgotadas")
                     throw new Error(result.error || 'Ocorreu um erro ao processar sua resposta.');
                 }
             } catch (error) {
